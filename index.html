@@ -149,14 +149,6 @@
 </style>
 
 <script>
-    function toRadian(degree) {
-        return degree*Math.PI/180;
-    }
-
-    function roundTo(num, toNum=10) {// num=13.2345, toNum=10 ==> 13.2
-        return Math.round(num*toNum)/toNum;
-    }
-
     let editor = document.querySelector("#editor");
     let bgWidth = document.querySelector("#width");
     let bgHeight = document.querySelector("#height");
@@ -169,8 +161,6 @@
     let ctxHigh = canvasHigh.getContext("2d");
     // لون الخلفية
     let bgColorInput = document.getElementById("bg-color");
-    // النسبة بين الصورة الأصلية والمعروضة
-    let ratioHigh = 1;
 
     window.onload = () => {
         ctx.fillStyle = bgColorInput.value;
@@ -181,7 +171,7 @@
     bgWidth.oninput = () => {updateBackground();}
     bgHeight.oninput = () => {updateBackground();}
 
-    // دالة تغيير النص على القالب وتغيير لون النص
+    // دالة تغيير لون الخلفية
     function updateBackground() {
         canvasHighCont.style.width = `${bgWidth.value}px`;
         canvasHighCont.style.height = `${bgHeight.value}px`;
@@ -207,10 +197,9 @@
         submitButton.href = dataURL;
     }
 
-    // تنزيل الإقتباس
+    // تنزيل الخلفية
     submitButton.onclick = () => {
         submitButton.setAttribute("download", `${bgWidth.value}x${bgHeight.value}.png`);
     };
-
 </script>
 </html>
