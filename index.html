@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>خلفيات</title>
+</head>
+
+<body>
+<div id="editor">
+    <h1>عمل خلفيات</h1>
+    
+    <div id="width-input" class="input">
+        <label for="width">طول الخلفية</label>
+        <input type="number" id="width" name="width" value="1080" min="1">
+    </div>
+
+    <div id="height-input" class="input">
+        <label for="height">عرض الخلفية</label>
+        <input type="number" id="height" name="height" value="720" min="1">
+    </div>
+
+    <div id="color-input" class="input">
+        <label for="bg-color">لون الخلفية</label>
+        <input type="color" id="bg-color" name="bg-color" value="#fff">
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
+
+
+    <a id="submit" download="edited-image.png">تنزيل الخلفية</a>
+</div>
+
+<div class="high-container" style="display: none;">
+    <img id="image-high-resolution" src="">
+    <canvas id="canvas-high-resolution"></canvas>
+</div>
+</body>
+
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap");
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: sans-serif;
+        background-color: #f3f3f3;
+    }
+
+    #editor {
+        max-width: 600px;
+        margin: 20px auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        padding: 30px;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+    }
+
+    .input {
+        margin: 5px 0;
+    }
+
+    label {
+        margin-bottom: 10px;
+        font-weight: bold;
+        text-align: center;
+        display: block;
+    }
+
+    #image {
+        display: inline-block;
+    }
+
+    #submit {
+        background-color: #0088cc;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.2s ease-in-out;
+        margin: 20px 0;
+    }
+
+    #submit:hover {
+        background-color: #006699;
+    }
+
+    #submit:active {
+        background-color: #005577;
+    }
+
+    #color-input {
+        margin-bottom: 20px;
+    }
+
+    #canvas-container {
+        max-width: 90%;
+        margin: 0 auto;
+        position: relative;
+        border: 5px solid black;
+    }
+
+    #canvas-container canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+    }
+
+    .high-container {
+        position: relative;
+    }
+
+    .high-container canvas, .high-container img {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    @media (max-width: 630px) {
+        #editor {
+            position: absolute;
+            width: 95%;
+            top: 0px;
+            right: 2.5%;
+        }
+
+        #submit {
+            font-size: 16px;
+        }
+    }
+</style>
+
+<script>
+    function toRadian(degree) {
+        return degree*Math.PI/180;
+    }
+
+    function roundTo(num, toNum=10) {// num=13.2345, toNum=10 ==> 13.2
+        return Math.round(num*toNum)/toNum;
+    }
+
+    let editor = document.querySelector("#editor");
+    let bgWidth = document.querySelector("#width");
+    let bgHeight = document.querySelector("#height");
+    let submitButton = document.getElementById("submit");
+    let canvas = document.getElementById("canvas");
+    let canvasCont = canvas.parentNode;
+    let canvasHigh = document.getElementById("canvas-high-resolution");
+    let canvasHighCont = canvasHigh.parentNode;
+    let ctx = canvas.getContext("2d");
+    let ctxHigh = canvasHigh.getContext("2d");
+    // لون الخلفية
+    let bgColorInput = document.getElementById("bg-color");
+    // النسبة بين الصورة الأصلية والمعروضة
+    let ratioHigh = 1;
+
+    window.onload = () => {
+        ctx.fillStyle = bgColorInput.value;
+        updateBackground();
+    }
+
+    bgColorInput.oninput = () => {updateBackground();}
+    bgWidth.oninput = () => {updateBackground();}
+    bgHeight.oninput = () => {updateBackground();}
+
+    // دالة تغيير النص على القالب وتغيير لون النص
+    function updateBackground() {
+        canvasHighCont.style.width = `${bgWidth.value}px`;
+        canvasHighCont.style.height = `${bgHeight.value}px`;
+        canvasHigh.width = parseInt(canvasHighCont.style.width);
+        canvasHigh.height = parseInt(canvasHighCont.style.height);
+
+        canvasCont.style.width = `${bgWidth.value}px`;
+        canvasCont.style.height = `${(parseInt(bgHeight.value)/parseInt(bgWidth.value))*canvasCont.offsetWidth}px`;
+        canvas.width = canvasCont.offsetWidth;
+        canvas.height = canvasCont.offsetHeight;
+
+        ctx.fillStyle = bgColorInput.value; // اللون
+        ctxHigh.fillStyle = bgColorInput.value; // اللون
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctxHigh.clearRect(0, 0, canvasHigh.width, canvasHigh.height);
+        
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctxHigh.fillRect(0, 0, canvasHigh.width, canvasHigh.height);
+
+        canvasHigh = document.getElementById("canvas-high-resolution");
+        let dataURL = canvasHigh.toDataURL("image/png");
+        submitButton.href = dataURL;
+    }
+
+    // تنزيل الإقتباس
+    submitButton.onclick = () => {
+        submitButton.setAttribute("download", `${bgWidth.value}x${bgHeight.value}.png`);
+    };
+
+</script>
+</html>
